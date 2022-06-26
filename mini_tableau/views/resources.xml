@@ -1,0 +1,17 @@
+<odoo>
+    <template id="new_style_assetss" name="query assets" inherit_id="web.assets_frontend">
+        <xpath expr="." position="inside">
+            <link href="/mini_tableau/static/scss/c3.min.scss" rel="stylesheet" type="text/scss"/>
+            <link href="/mini_tableau/static/scss/main.scss" rel="stylesheet" type="text/scss"/>
+
+            <script type="text/javascript" src="https://d3js.org/d3.v5.min.js" />
+            <script type="text/javascript" src="/mini_tableau/static/js/c3.min.js"/>
+            <script src="https://cdn.jsdelivr.net/gh/linways/table-to-excel@v1.0.4/dist/tableToExcel.js">
+			</script>
+
+            <script type="text/javascript" src="/mini_tableau/static/js/main.js"/>
+            <script type="text/javascript" src="/mini_tableau/static/js/chart.js"/>
+            <script type="text/javascript" src="/mini_tableau/static/js/other.js"/>
+        </xpath>
+    </template>
+</odoo>

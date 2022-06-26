@@ -1,0 +1,183 @@
+<odoo>
+    <template id="report_dashboard_template" name="Report Dashboard">
+        <t t-call-assets="web.assets_common" />
+        <t t-call-assets="web.assets_frontend" />
+
+        <div class="loderScreen hideScreen">
+            <div class="spinner-border text-primary" id="spinner" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+
+        <!-- - Save Report Modal -->
+        <div class="modal fade" id="saveReportModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+							Save Report
+                        </h5>
+                    </div>
+                    <div class="modal-body">
+                        <form class="mb-0" onsubmit="return setValues()" method="POST" action="/save-report">
+                            <input type="hidden" id="rows" name="rows" value="" />
+                            <input type="hidden" id="columns" name="columns" value="" />
+                            <input type="hidden" id="chart-type" name="chart_type" value="" />
+                            <input type="hidden" id="sql_query" name="sql_query" value="" />
+
+                            <div class="d-flex">
+                                <input type="text" class="form-control" id="report-name" name="report_name" placeholder="Report Name" value="" />
+                                <button class="btn btn-primary pr-3 pl-3 ml-2">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary pr-3 pl-3" data-dismiss="modal">
+							Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- - Query Modal -->
+        <div class="modal fade" id="queryModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+							Sql Query
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">
+								Show
+                            </span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <span class="modal-title" id="modal-query">
+							Empty Query
+                        </span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+							Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="dashboard-sidebar">
+                <div class="column-name-container">
+                    <div class="table-label-container">
+                        <h5 class="mt-0">Column Names</h5>
+                    </div>
+                    <ul class="scroll-hide column-names">
+                        <t t-foreach="table_column_names" t-as="column_name">
+                            <li class="table-name li-main draggable" t-att-id="column_name" data-toggle="tooltip" data-placement="right" t-att-title="column_name" draggable="true">
+                                <span class="fa fa-columns icon pointer-events-none" />
+                                <span class="pointer-events-none" t-att-id="'_' + column_name">
+                                    <t t-if="len(column_name) > 25">
+                                        <t t-esc="column_name[:25] + '...'" />
+                                    </t>
+                                    <t t-else="">
+                                        <t t-esc="column_name" />
+                                    </t>
+                                </span>
+                            </li>
+                        </t>
+                    </ul>
+                </div>
+            </div>
+            <div class="dashboard-main d-flex">
+                <div class="dashboard-main-chart-display">
+                    <div class="rows-n-cols-container bg-base">
+                        <div class="chart-rows-n-cols d-flex mb-2">
+                            <div class="selected-name">
+                                <svg class="mr-1" height="12px" width="12px" version="1.1" id="Capa_1"
+                                    xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 384 384" style="enable-background:new 0 0 384 384;">
+                                    <path d="M0,0v80v32v272h176h32h176V112V80V0H0z M176,352H32V112h144V352z M352,352H208V112h144V352z M352,80H208h-32H32V32h320V80z" />
+                                </svg>
+                                <p class="mb-0">
+									Columns
+                                </p>
+                            </div>
+                            <ul id="selected-columns" class="selected-value _container">
+                            </ul>
+                        </div>
+                        <div class="chart-rows-n-cols d-flex">
+                            <div class="selected-name">
+                                <svg class="mr-1" height="12px" width="12px" version="1.1" id="Capa_1"
+                                    xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 384 384">
+                                    <path d="M0,0v80v32v96v32v144h112h32h96h32h112V240v-32v-96V80V0H0z M112,352H32V240h80V352z M112,208H32v-96h80V208z M240,352h-96V240h96V352z M240,208h-96v-96h96V208z M352,352h-80V240h80V352z M352,208h-80v-96h80V208z M352,80h-80h-32h-96h-32H32V32h320V80z" />
+                                </svg>
+                                <p class="mb-0">Rows</p>
+                            </div>
+                            <ul id="selected-rows" class="selected-value _container"></ul>
+                        </div>
+                    </div>
+                    <input type="hidden" id="sql-query" t-att-value="sql_query" />
+                    <div class="chart-display-container chart-display-container-unsaved scroll-hide"></div>
+                </div>
+                <div>
+                    <div class="dashboard-main-button-block">
+                        <button type="button" class="btn btn-primary mb-1" data-toggle="modal" data-target="#queryModal">Show Query</button>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#saveReportModal">Save Report</button>
+                    </div>
+                    <h6 class="border-top text-center font-medium mb-0" style="padding:5px">charts</h6>
+                    <div id="make-chart" class="dashboard-main-chart-types">
+                        <div class="chart-icon">
+                            <img id="line-chart" src="/mini_tableau/static/images/png/line-chart.png" alt="line-chart" />
+                        </div>
+                        <div class="chart-icon">
+                            <img id="area-chart" src="/mini_tableau/static/images/png/area-chart.png" alt="area-chart" />
+                        </div>
+                        <div class="chart-icon">
+                            <img id="curved_line-chart" src="/mini_tableau/static/images/png/curved_line-chart.png" alt="curved_line-chart" />
+                        </div>
+                        <div class="chart-icon">
+                            <img id="curved_area-chart" src="/mini_tableau/static/images/png/curved_area-chart.png" alt="curved_area-chart" />
+                        </div>
+                        <div class="chart-icon">
+                            <img id="bar-chart" src="/mini_tableau/static/images/png/bar-chart.png" alt="bar-chart" />
+                        </div>
+                        <div class="chart-icon">
+                            <img id="stacked_bar-chart" src="/mini_tableau/static/images/png/stacked_bar-chart.png" alt="stacked_bar-chart" />
+                        </div>
+                        <div class="chart-icon">
+                            <img id="horizontal-bar-chart" src="/mini_tableau/static/images/png/horizontal-bar-chart.png" alt="horizontal-bar-chart" />
+                        </div>
+                        <div class="chart-icon">
+                            <img id="horizontal-stacked_bar-chart" src="/mini_tableau/static/images/png/horizontal-stacked_bar-chart.png" alt="horizontal-stacked_bar-chart" />
+                        </div>
+                        <div class="chart-icon">
+                            <img id="pie-chart" src="/mini_tableau/static/images/png/pie-chart.png" alt="pie-chart" />
+                        </div>
+                        <div class="chart-icon">
+                            <img id="donut-chart" src="/mini_tableau/static/images/png/donut-chart.png" alt="donut-chart" />
+                        </div>
+                        <!-- <div class="chart-icon">
+                            <img id="scatter-chart" src="/mini_tableau/static/images/png/scatter-chart.png" alt="scatter-chart" />
+                        </div>
+                        <div class="chart-icon">
+                            <img id="bubble-chart" src="/mini_tableau/static/images/png/bubble-chart.png" alt="bubble-chart"/>
+                        </div>
+                        <div class="chart-icon">
+                            <img id="grantt-chart" src="/mini_tableau/static/images/png/grantt-chart.png" alt="grantt-chart"/>
+                        </div>
+
+                        <div class="chart-icon">
+                            <img id="funnel-chart" src="/mini_tableau/static/images/png/funnel-chart.png" alt="funnel-chart"/>
+                        </div>
+                        <div class="chart-icon">
+                            <img id="heatmap-chart" src="/mini_tableau/static/images/png/heatmap-chart.png" alt="heatmap-chart"/>
+                        </div>
+                        <div id="map-chart" class="chart-icon"></div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+</odoo>

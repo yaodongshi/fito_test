@@ -1,0 +1,115 @@
+<odoo>
+    <template id="dashboard_template" name="Query Editor Dashboard">
+        <t t-call-assets="web.assets_common"/>
+        <t t-call-assets="web.assets_frontend"/>
+
+        <div class="loderScreen hideScreen">
+            <div class="spinner-border text-primary" id="spinner" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="dashboard-sidebar">
+                <div class="report-container">
+                    <div class="table-label-container">
+                        <h5 class="mt-0">Reports</h5>
+                    </div>
+                    <ul id="report-names">
+                        <t t-foreach="reports" t-as="reports">
+                            <li class="d-flex" t-att-id="reports.id" data-toggle="tooltip" data-placement="right"
+                                t-att-title="reports.report_name">
+                                <a class="li-item li-report-item reportLink" id="reportLink" t-att-title="reports.user_query"
+                                   target="_blank">
+                                    <span t-att-id="reports.id" class="fa fa-area-chart icon"/>
+                                    <t t-if="len(reports.report_name) > 22">
+                                        <t t-esc="reports.report_name[:22] + '...'"/>
+                                    </t>
+                                    <t t-else="">
+                                        <t t-esc="reports.report_name"/>
+                                    </t>
+                                </a>
+                                 <a t-att-href="'/report/'+str(reports.id)" target="_blank">
+                                    <span style="color:red;" t-att-id="reports.id" class="fa fa-play icon-trash"/>
+                                </a>
+                                <a t-att-href="'/delete-report/'+str(reports.id)" onclick="return confirmDelete();">
+                                    <span style="color:red;" t-att-id="reports.id" class="fa fa-trash icon-trash"/>
+                                </a>
+                            </li>
+                        </t>
+                    </ul>
+                </div>
+                <div class="table-name-container table">
+                    <div class="table-label-container">
+                        <h5 class="pb-2 mt-0">Tables</h5>
+                        <input class="form-control form-control-sm" type="text" id="search-input" onkeyup="listFilter()"
+                               placeholder="Search for table names.."/>
+                    </div>
+                    <ul id="table-names">
+                        <t t-foreach="tables" t-as="table_name">
+                            <li class="table-name" data-toggle="tooltip" data-placement="right"
+                                t-att-title="table_name[0]">
+                                <span class="li-item" t-att-id="table_name[0]">
+                                    <span class="fa fa-table icon"/>
+                                    <t t-if="len(table_name[0]) > 25">
+                                        <t t-esc="table_name[0][:25] + '...'"/>
+                                    </t>
+                                    <t t-else="">
+                                        <t t-esc="table_name[0]"/>
+                                    </t>
+                                </span>
+                            </li>
+                        </t>
+                    </ul>
+                </div>
+            </div>
+            <div class="dashboard-main">
+                <div class="query-input-container">
+                    <div class="form-group">
+                        <textarea class="form-control" id="query-input" rows="3"></textarea>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button id="execute-query" class="btn btn-primary pr-3 pl-3">Execute Query</button>
+                    </div>
+                </div>
+                <div class="table-display-container">
+                    <div class="table-display-options">
+                        <div id="table-display-name">
+                            Table: No table selected
+                        </div>
+                        <div id="table-display-rows_no">
+                            <div class="form-group row mb-0">
+                                <label class="col-sm-4 col-form-label" for="total-rows">
+                                    <b>Rows:</b>
+                                </label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="total-rows">
+                                        <option>100</option>
+                                        <option>200</option>
+                                        <option>300</option>
+                                        <option>500</option>
+                                        <option>1000</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button id="exportBtn" class="btnn btn btn-primary pr-3 pl-3">
+                                Export To Excel
+                            </button>
+                            <form class="mb-0" target="_blank" onsubmit="return setReportSQLQuery()" method="POST"
+                                  action="/report-dashboard">
+                                <input type="hidden" id="sql-query" name="sql_query" value=""/>
+                                <button class="btnn btn btn-primary pr-3 pl-3">Make Report</button>
+                            </form>
+                        </div>
+                    </div>
+                    <table id="table-report">
+                        <thead>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </template>
+</odoo>

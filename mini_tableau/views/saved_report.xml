@@ -1,0 +1,63 @@
+<odoo>
+	<template id="saved_report_dashboard_template" name="Report Dashboard">
+		<t t-call-assets="web.assets_common" />
+		<t t-call-assets="web.assets_frontend" />
+
+		<div class="loderScreen hideScreen">
+            <div class="spinner-border text-primary" id="spinner" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+
+		<!-- - Query Modal -->
+		<div class="modal fade" id="queryModal" tabindex="-1" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							Sql Query
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">
+								show
+							</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<span class="modal-title" id="modal-query">
+							Empty Query
+						</span>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">
+							Close
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <div>
+            <div class="dashboard-saved-chart-header">
+                <div class="saved-report-title">
+                    <h5 class="modal-title text-center" id="report-label">
+                        Unsaved Report
+                    </h5>
+                </div>
+                <button type="button" class="query-btn-saved btn btn-primary" data-toggle="modal" data-target="#queryModal">
+                    Show Query
+                </button>
+            </div>
+            <div class="dashboard-saved-chart">
+                <input type="hidden" id="sql-query" t-att-value="sql_query" />
+                <input type="hidden" id="report-name-get" t-att-value="report_name" />
+                <input type="hidden" id="report-columns" t-att-value="report_columns" />
+                <input type="hidden" id="report-rows" t-att-value="report_rows" />
+                <input type="hidden" id="chart-type" t-att-value="chart_type" />
+
+                <div class="chart-display-container chart-display-container-saved saved-chart">
+                </div>
+            </div>
+        </div>
+	</template>
+</odoo>

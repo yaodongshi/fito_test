@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+pragtech_whatsapp_base.access_whatsapp_scan_qr_code,access_whatsapp_scan_qr_code,pragtech_whatsapp_base.model_whatsapp_scan_qr_code,base.group_user,1,1,1,1
